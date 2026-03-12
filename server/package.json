@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "apicache": "^1.6.3",
+    "cloudinary": "^2.9.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
+    "mongoose": "^9.2.4",
+    "multer": "^2.1.1",
+    "multer-storage-cloudinary": "^2.2.1",
+    "redis": "^5.11.0",
+    "stripe": "^20.4.1"
+  }
+}
