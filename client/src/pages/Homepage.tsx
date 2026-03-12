@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { assets, products} from '../assets/assets'
 import Footer from '../components/Footer'
 import "../App.css"
+import Card from '../components/Card'
 const Homepage = () => {
 
     const latestcollection = products.filter((element)=>element.bestseller===false).slice(0,10).reverse();
@@ -14,11 +15,11 @@ const Homepage = () => {
       <div className='flex justify-center'>
         <article className='flex border border-black h-120 justify-center w-3/4'>
             <div className='flex flex-row w-1/2 justify-center items-center'>
-            <p>
-              <p className='font-bold font-serif text-lg'>____ OUR BESTSELLERS</p>
-              <h1 className='font-semi font-serif text-6xl'>Latest Arrivals</h1>
-              <p className='font-bold text-lg font-serif'>SHOP NOW ____</p>
-            </p>
+            <div className='flex flex-col gap-2'>
+              <p className='font-bold text-gray-700 text-lg'>____ OUR BESTSELLERS</p>
+              <h1 className='font-bold text-gray-900 text-6xl'>Latest Arrivals</h1>
+              <p className='font-bold text-gray-700 text-lg'>SHOP NOW ____</p>
+            </div>
             </div>
             <div className='flex flex-row w-1/2'>
               <img src={assets.hero_img} alt="hero-image"/>
@@ -30,13 +31,11 @@ const Homepage = () => {
         <section className='grid grid-cols-5 w-full justify-items-center-safe justify-center gap-y-10 mt-5'>
           {
             latestcollection.map((element)=>
-              <div className='flex flex-col w-67'>
-                <div className='overflow-hidden'>
-                  <img src={element.image[0]} alt={element.name} className='animation'/>
-                </div>
-                <p>{element.name}</p>
-                <p className='font-semibold'>Ksh {element.price}</p>
-              </div>
+              <Card
+              image={element.image[0]}
+              name={element.name}
+              price={element.price}
+              />
             )
           }
         </section>
@@ -45,13 +44,11 @@ const Homepage = () => {
         <section className='grid grid-cols-5 w-full justify-items-center-safe justify-center gap-y-10 mt-5'>
           {
             bestseller.map((element)=>
-              <div className='flex flex-col w-67'>
-                <div className='overflow-hidden'>
-                  <img src={element.image[0]} alt={element.name} className='animation'/>
-                </div>
-                <p>{element.name}</p>
-                <p className='font-semibold'>Ksh {element.price}</p>
-              </div>
+              <Card
+              image={element.image[0]}
+              name={element.name}
+              price={element.price}
+              />
             )
           }
         </section>
@@ -72,13 +69,6 @@ const Homepage = () => {
             <h1 className='font-bold mt-2'>Best customer support</h1>
             <p className='mt-1'>We provide 24/7 customer support</p>
           </div> 
-          </div>
-          <div className='flex flex-col justify-center items-center mt-30'>
-            <h1 className='font-bold text-3xl'>Subscribe now & get 20% off</h1>
-            <p className='mt-3'>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-            <div className='mt-5'>
-            <input type="email" placeholder='Enter your email' className='p-3.5 outline-none border w-150'/><button className='bg-black text-white w-35 h-14'>SUBSCRIBE</button>
-            </div>
           </div>
         </section>
     </main>

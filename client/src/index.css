@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 
 *{
   box-sizing: border-box;
@@ -10,5 +11,7 @@ html{
 
 body{
   height:100vh;
+  font-family: 'Lora', serif;
+  color: #333;
 }
 
