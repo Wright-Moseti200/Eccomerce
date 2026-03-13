@@ -2,11 +2,32 @@ import React, { createContext } from 'react'
 
 export const Contextdata = createContext();
 
-const ContextProvider = ({children}) => {
+const ContextProvider = ({children}) => {  
+
+  let cart =():void =>{
+
+  }
+
+  let addtocart = () :void =>{
+
+  }
+
+  let removefromcart = () :void =>{
+
+  }
+
+  let updatecart = () :void =>{
+
+  }
+
+  let gettotalamount = () :void =>{
+
+  }
+
   return (
-    <div>
-      
-    </div>
+    <Contextdata.Provider value={cart,addtocart,removefromcart,updatecart,gettotalamount}>
+        {children}
+    </Contextdata.Provider>
   )
 }
 

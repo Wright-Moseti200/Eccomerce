@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { assets, products} from '../assets/assets'
-import Footer from '../components/Footer'
 import "../App.css"
-import Card from '../components/Card'
 const Homepage = () => {
 
     const latestcollection = products.filter((element)=>element.bestseller===false).slice(0,10).reverse();
@@ -15,11 +12,11 @@ const Homepage = () => {
       <div className='flex justify-center'>
         <article className='flex border border-black h-120 justify-center w-3/4'>
             <div className='flex flex-row w-1/2 justify-center items-center'>
-            <div className='flex flex-col gap-2'>
-              <p className='font-bold text-gray-700 text-lg'>____ OUR BESTSELLERS</p>
-              <h1 className='font-bold text-gray-900 text-6xl'>Latest Arrivals</h1>
-              <p className='font-bold text-gray-700 text-lg'>SHOP NOW ____</p>
-            </div>
+            <p>
+              <p className='font-bold font-serif text-lg'>____ OUR BESTSELLERS</p>
+              <h1 className='font-semi font-serif text-6xl'>Latest Arrivals</h1>
+              <p className='font-bold text-lg font-serif'>SHOP NOW ____</p>
+            </p>
             </div>
             <div className='flex flex-row w-1/2'>
               <img src={assets.hero_img} alt="hero-image"/>
@@ -30,12 +27,16 @@ const Homepage = () => {
         <p className='mt-2 text-center'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Soluta in ullam recusandae, illum obcaecati rem itaque fugit nemo labore amet laudantium, beatae id magnam velit ipsam alias error cum veniam.</p>
         <section className='grid grid-cols-5 w-full justify-items-center-safe justify-center gap-y-10 mt-5'>
           {
-            latestcollection.map((element)=>
-              <Card
-              image={element.image[0]}
-              name={element.name}
-              price={element.price}
-              />
+            latestcollection.map((element, index)=>
+              <Link to={`/product/${element._id}`} key={index} className='text-current no-underline block'>
+                <div className='flex flex-col w-67'>
+                  <div className='overflow-hidden'>
+                    <img src={element.image[0]} alt={element.name} className='animation'/>
+                  </div>
+                  <p>{element.name}</p>
+                  <p className='font-semibold'>Ksh {element.price}</p>
+                </div>
+              </Link>
             )
           }
         </section>
@@ -43,12 +44,16 @@ const Homepage = () => {
         <p className='mt-2 text-center'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Soluta in ullam recusandae, illum obcaecati rem itaque fugit nemo labore amet laudantium, beatae id magnam velit ipsam alias error cum veniam.</p>
         <section className='grid grid-cols-5 w-full justify-items-center-safe justify-center gap-y-10 mt-5'>
           {
-            bestseller.map((element)=>
-              <Card
-              image={element.image[0]}
-              name={element.name}
-              price={element.price}
-              />
+            bestseller.map((element, index)=>
+              <Link to={`/product/${element._id}`} key={index} className='text-current no-underline block'>
+                <div className='flex flex-col w-67'>
+                  <div className='overflow-hidden'>
+                    <img src={element.image[0]} alt={element.name} className='animation'/>
+                  </div>
+                  <p>{element.name}</p>
+                  <p className='font-semibold'>Ksh {element.price}</p>
+                </div>
+              </Link>
             )
           }
         </section>
