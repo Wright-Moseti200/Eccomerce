@@ -4,28 +4,28 @@ export const Contextdata = createContext();
 
 const ContextProvider = ({children}) => {  
 
-  let cart =():void =>{
+  const cart =():void =>{
 
   }
 
-  let addtocart = () :void =>{
+  const addtocart = () :void =>{
 
   }
 
-  let removefromcart = () :void =>{
+  const removefromcart = () :void =>{
 
   }
 
-  let updatecart = () :void =>{
+  const updatecart = () :void =>{
 
   }
 
-  let gettotalamount = () :void =>{
+  const gettotalamount = () :void =>{
 
   }
 
   return (
-    <Contextdata.Provider value={cart,addtocart,removefromcart,updatecart,gettotalamount}>
+    <Contextdata.Provider value={addtocart,cart,removefromcart,updatecart,gettotalamount}>
         {children}
     </Contextdata.Provider>
   )
