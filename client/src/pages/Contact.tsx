@@ -14,10 +14,10 @@ const Contact = () => {
           
           <div className='flex flex-col gap-2'>
             <h2 className='font-bold text-gray-900 text-xl'>Our Store</h2>
-            <p className='text-gray-600'>54709 Willms Station</p>
-            <p className='text-gray-600'>Suite 350, Washington, USA</p>
-            <p className='text-gray-600 mt-2'>Tel: (415) 555-0132</p>
-            <p className='text-gray-600'>Email: admin@forever.com</p>
+            <p className='text-gray-600'>80100 Mombasa Kenya</p>
+            <p className='text-gray-600'>Suite 350, Mombasa Kenya</p>
+            <p className='text-gray-600 mt-2'>Tel: +254714471627</p>
+            <p className='text-gray-600'>Email: wrightgichana@gmail.com</p>
           </div>
 
           <div className='flex flex-col gap-2'>
