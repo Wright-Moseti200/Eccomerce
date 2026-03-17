@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { assets } from '../assets/assets'
+import { Contextdata } from '../context/ContextProvider'
 
 const Checkout = () => {
 
   const [method, setMethod] = useState('cod');
+  const context = useContext(Contextdata);
 
   return (
     <div className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] mb-20'>
@@ -46,15 +48,15 @@ const Checkout = () => {
           <div className='flex flex-col gap-2 mt-2 text-[15px] sm:text-base'>
             <div className='flex justify-between py-3 border-b'>
               <p>Subtotal</p>
-              <p>$ 294.00</p>
+              <p>Ksh {context ? context.gettotalamount() : 0}.00</p>
             </div>
             <div className='flex justify-between py-3 border-b'>
               <p>Shipping Fee</p>
-              <p>$ 10.00</p>
+              <p>Ksh {context && context.gettotalamount() > 0 ? context.delivery_fee : 0}.00</p>
             </div>
             <div className='flex justify-between py-3'>
               <b className='text-lg'>Total</b>
-              <b className='text-lg'>$ 304.00</b>
+              <b className='text-lg'>Ksh {context && context.gettotalamount() > 0 ? context.gettotalamount() + context.delivery_fee : 0}.00</b>
             </div>
           </div>
         </div>
@@ -80,7 +82,7 @@ const Checkout = () => {
           </div>
 
           <div className='w-full text-end mt-8'>
-            <button className='bg-black text-white px-16 py-3 text-sm hover:bg-gray-800 transition-colors uppercase font-medium'>
+            <button onClick={() => context?.navigate('/')} className='bg-black text-white px-16 py-3 text-sm hover:bg-gray-800 transition-colors uppercase font-medium'>
               Place Order
             </button>
           </div>

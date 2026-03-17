@@ -1,14 +1,31 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { assets, products } from '../assets/assets'
+import { useNavigate } from 'react-router-dom'
+import { Contextdata } from '../context/ContextProvider'
 
 const Cart = () => {
 
-  // Mock initial cart items using the first three products to display the UI
-  const cartItems = products.slice(0, 3).map((p, i) => ({
-    ...p,
-    size: ['M', 'S', 'XL'][i], // mock sizes from screenshot
-    quantity: [2, 1, 1][i]     // mock quantities from screenshot
-  }))
+  const context = useContext(Contextdata);
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (context) {
+      const tempData: any[] = [];
+      context.cart.forEach(item => {
+        const productData = products.find(product => product._id === item.id);
+        if (productData) {
+          tempData.push({
+            ...productData,
+            size: productData.sizes[item.sizeindex],
+            sizeindex: item.sizeindex,
+            quantity: item.quantity
+          });
+        }
+      });
+      setCartItems(tempData);
+    }
+  }, [context?.cart]);
 
   return (
     <>
@@ -27,15 +44,22 @@ const Cart = () => {
                   <div>
                     <p className='text-xs sm:text-lg font-medium text-gray-700'>{item.name}</p>
                     <div className='flex items-center gap-5 mt-2'>
-                      <p>${item.price}</p>
+                      <p>Ksh {item.price}</p>
                       <p className='px-2 sm:px-3 sm:py-1 border bg-slate-50'>{item.size}</p>
                     </div>
                   </div>
                 </div>
                 
-                <input className='border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1 outline-none appearance-none text-center' type='number' min={1} defaultValue={item.quantity} />
+                <div className='flex items-center gap-4 justify-between w-full'>
+                  <input onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val > 0) context?.updatecart(item._id, val, item.sizeindex)
+                  }} className='border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1 outline-none appearance-none text-center' type='number' min={1} defaultValue={item.quantity} />
+                  
+                  <p className='font-medium text-sm sm:text-base hidden sm:block'>Ksh {item.price * item.quantity}</p>
+                </div>
                 
-                <img className='w-4 sm:w-5 cursor-pointer hover:opacity-75 transition-opacity justify-self-end' src={assets.bin_icon} alt="delete" />
+                <img onClick={() => context?.removefromcart(item._id)} className='w-4 sm:w-5 cursor-pointer hover:opacity-75 transition-opacity justify-self-end' src={assets.bin_icon} alt="delete" />
               </div>
             ))}
           </section>
@@ -49,21 +73,21 @@ const Cart = () => {
               <div className='flex flex-col gap-2 mt-2 text-[15px] sm:text-base'>
                 <div className='flex justify-between py-3 border-b'>
                   <p className='text-gray-600'>Subtotal</p>
-                  <p className='font-medium'>$ 294.00</p>
+                  <p className='font-medium'>Ksh {context ? context.gettotalamount() : 0}.00</p>
                 </div>
                 <div className='flex justify-between py-3 border-b'>
                   <p className='text-gray-600'>Shipping Fee</p>
-                  <p className='font-medium'>$ 10.00</p>
+                  <p className='font-medium'>Ksh {context && context.gettotalamount() > 0 ? context.delivery_fee : 0}.00</p>
                 </div>
                 <div className='flex justify-between py-3 font-bold'>
                   <p>Total</p>
-                  <p>$ 304.00</p>
+                  <p>Ksh {context && context.gettotalamount() > 0 ? context.gettotalamount() + context.delivery_fee : 0}.00</p>
                 </div>
               </div>
 
               <div className='w-full text-right mt-8'>
-                <button className='bg-black text-white px-8 py-3 w-full sm:w-auto hover:bg-gray-800 transition-colors uppercase text-sm font-medium'>
-                  Proceed to Checkout
+                <button onClick={() => navigate('/checkout')} className='bg-black text-white px-8 py-3 w-full sm:w-auto hover:bg-gray-800 transition-colors uppercase text-sm font-medium'>
+                 Proceed to Checkout
                 </button>
               </div>
 

@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import {assets} from '../assets/assets'
 import { Outlet,Link } from 'react-router-dom'
 import Footer from './Footer'
+import { Contextdata } from '../context/ContextProvider'
 const Navbar = () => {
+  const context = useContext(Contextdata);
   return (
     <>
     <nav className='flex w-full justify-around'>
@@ -18,7 +20,7 @@ const Navbar = () => {
         <img src={assets.profile_icon} alt="profile_icon" className='h-5'/>
         <div className='flex relative'>
         <Link to="/cart"><img src={assets.cart_icon} alt="cart_icon" className='h-5 relative'/>
-          <span className='absolute left-2 top-2 h-5 w-5 text-center rounded-full bg-black text-white'>0</span>
+          <span className='absolute left-2 top-2 h-5 text-[10px] w-5 text-center rounded-full bg-black text-white leading-5'>{context ? context.getcarttotal() : 0}</span>
           </Link>
         </div>
       </div>

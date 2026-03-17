@@ -33,8 +33,8 @@ const Homepage = () => {
                   <div className='overflow-hidden'>
                     <img src={element.image[0]} alt={element.name} className='animation'/>
                   </div>
-                  <p>{element.name}</p>
-                  <p className='font-semibold'>Ksh {element.price}</p>
+                  <p className='mt-2'>{element.name}</p>
+                  <p className='font-semibold mt-1'>Ksh {element.price}</p>
                 </div>
               </Link>
             )
@@ -50,8 +50,8 @@ const Homepage = () => {
                   <div className='overflow-hidden'>
                     <img src={element.image[0]} alt={element.name} className='animation'/>
                   </div>
-                  <p>{element.name}</p>
-                  <p className='font-semibold'>Ksh {element.price}</p>
+                  <p className='mt-2'>{element.name}</p>
+                  <p className='font-semibold mt-1'>Ksh {element.price}</p>
                 </div>
               </Link>
             )
