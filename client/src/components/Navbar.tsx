@@ -3,8 +3,12 @@ import {assets} from '../assets/assets'
 import { Outlet,Link } from 'react-router-dom'
 import Footer from './Footer'
 import { Contextdata } from '../context/ContextProvider'
+import {useUser,useClerk,SignedIn,SignedOut,UserButton} from "@clerk/clerk-react";
 const Navbar = () => {
   const context = useContext(Contextdata);
+  const {user} = useUser();
+  const {openSignIn} = useClerk();
+
   return (
     <>
     <nav className='flex w-full justify-around'>
@@ -17,7 +21,12 @@ const Navbar = () => {
       </div>
       <div className='flex items-center justify-around w-1/10 '>
         <img src={assets.search_icon} alt="search_icon" className='h-5'/>
-        <img src={assets.profile_icon} alt="profile_icon" className='h-5'/>
+          <SignedOut>
+             <img src={assets.profile_icon} alt="profile_icon" className='h-5' onClick={()=>openSignIn()}/>
+          </SignedOut>
+          <SignedIn>
+          <UserButton />
+          </SignedIn>
         <div className='flex relative'>
         <Link to="/cart"><img src={assets.cart_icon} alt="cart_icon" className='h-5 relative'/>
           <span className='absolute left-2 top-2 h-5 text-[10px] w-5 text-center rounded-full bg-black text-white leading-5'>{context ? context.getcarttotal() : 0}</span>

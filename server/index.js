@@ -2,6 +2,8 @@ let express = require("express");
 let app = express();
 let cors = require("cors");
 let ratelimit = require("express-rate-limit");
+const { mongodb } = require("./config/mongodb");
+let {clerkMiddleware} = require("@clerk/express");
 let port = 4000;
 
 let limit = ratelimit({
@@ -9,10 +11,11 @@ let limit = ratelimit({
     max:100
 });
 
-app.use([cors(),limit]);
+app.use([cors(),limit(),]);
+app.use(clerkMiddleware());
 
-app.use('api/user');
-app.use('api/admin');
+mongodb();
+
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
 });
