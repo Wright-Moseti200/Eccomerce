@@ -1,5 +1,5 @@
 let express = require("express");
 let userRoutes = express.Router();
+let {requireAuth,getAuth} = require("@clerk/express");
 
-userRoutes.get("/get")
 module.exports={userRoutes};
