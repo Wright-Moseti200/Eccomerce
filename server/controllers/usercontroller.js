@@ -1,6 +1,6 @@
 let {Webhook} = require("svix");
 require("dotenv").config();
-let stripe = require("stripe")
+let stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 let {getAuth} = require("@clerk/express");
 const { UserModel } = require("../models/usermodel");
 let Redis = require("ioredis");
@@ -96,14 +96,31 @@ let getproducts = async (req,res)=>{
 //getcart
 let getcart = async(req,res)=>{
     try{
-        const cachekey = "cart";
-        let data = await client.get(cachekey);
+         let {userId} = getAuth(req);
+        if(!userId){
+            return res.status(401).json({
+                success:false
+            });
+        }
+        let data = await client.get(`cart:${userId}`);
         if(data){
             return res.status(200).json({
                 success:true,
-                cart
-            })
+                cart:JSON.parse(data),
+                source:"cache"
+            });
         }
+        let userdata = await UserModel.findOne({clerkid:userId});
+        if(!userdata){
+            return res.status(400).json({
+                success:false
+            });
+        }
+        await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),{"EX":60});
+        return res.status(200).json({
+            success:true,
+            cart:userdata.cartdata
+        });
     }
     catch(error){
         return res.status(500).json({
@@ -114,9 +131,33 @@ let getcart = async(req,res)=>{
 }
 
 //addtocart
-let addtocart = (req,res)=>{
-    try{
-        
+let addtocart = async(req,res)=>{
+    try{  
+        let {userId} = getAuth(req);
+        if(!userId){
+            return res.status(401).json({
+               success:false 
+            })
+        }
+        let {itemId,sizeindex} = req.body;
+        if(!itemId||!sizeindex){
+            return res.status(404).json({
+                success:false
+            });
+        }
+        let result = await UserModel.findOneAndUpdate({clerkid:userId,
+            "cartdata.id":itemId,
+            "cartdata.sizeindex":sizeindex   
+        },{$inc : {"cartdata.$.quantity":1}},{new:true})
+        if(!result){
+          result = await UserModel.findOneAndUpdate({clerkid:userId},{$push:{cartdata:{
+                id:itemId,
+                quantity:1,
+                sizeindex:sizeindex
+            }}},{new:true});
+        }
+        await client.set(`cart:${userId}`, JSON.stringify(result.cartdata), { EX: 60 });
+        return res.status(200).json({ success: true });
     }
     catch(error){
         return res.status(500).json({
@@ -127,9 +168,25 @@ let addtocart = (req,res)=>{
 }
 
 //removefromcart
-let removefromcart = (req,res)=>{
+let removefromcart = async(req,res)=>{
     try{
-
+        let {userId} = getAuth(req);
+        if(!userId){
+            return res.status(401).json({
+               success:false 
+            })
+        }
+        let {itemId,sizeindex} = req.body;
+        if(!itemId||!sizeindex){
+            return res.status(404).json({
+                success:false
+            });
+        }
+    let userdata =  await UserModel.findOneAndUpdate({clerkid:userId},{$pull : {cartdata:{id:itemId,sizeindex:sizeindex}}},{new:true})
+       await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),{"EX":60});
+       return res.status(200).json({
+        success:true
+       });
     }
     catch(error){
         return res.status(500).json({
@@ -140,7 +197,34 @@ let removefromcart = (req,res)=>{
 }
 
 //updatecart
-let updatecart = (req,res)=>{
+let updatecart = async(req,res)=>{
+    try{
+         let {userId} = getAuth(req);
+        if(!userId){
+            return res.status(401).json({
+               success:false 
+            })
+        }
+        let {itemId,sizeindex,quantity} = req.body;
+        if(!itemId||!sizeindex||!quantity){
+            return res.status(404).json({
+                success:false
+            });
+        }
+      let userdata =   await UserModel.findOneAndUpdate({clerkid:userId,"cartdata.id":itemId,"cartdata.sizeindex":sizeindex},{$set:{"cartdata.$.quantity":quantity}},{new:true});
+      await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),{"EX":60});
+      return res.status(200).json({ success: true });
+    }
+    catch(error){
+        return res.status(500).json({
+            success:false,
+            message:error.message
+        });
+    }
+}
+
+//getorders
+let getorders = (req,res)=>{
     try{
 
     }
@@ -151,11 +235,53 @@ let updatecart = (req,res)=>{
         });
     }
 }
-
 //stripepayment
-let stripepayment = (req,res)=>{
+let stripepayment = async(req,res)=>{
     try{
+        let {userId} = getAuth(req);
+        if(!userId){
+            return res.status(401).json({
+                success:true,
+            })
+        }
+        let user = await UserModel.findOne({clerkid:userId});
+        let {deliveryinfo,cartdata} = req.body;
+        let line_items = cartdata.map((element)=>({
+            price_data:{
+                currency:"KES",
+                product_data:{
+                    names:`${element.name} Size - ${element.size}`,
+                    image:[element.image[0]]
+                },
+                unit_amount:Math.round(element.price*100)
+            },
+            quantity:element.quantity
+        }));
 
+        let session = await stripe.checkout.sessions.create({
+            payment_method_types:["card"],
+            mode:"payment",
+            line_items:line_items,
+            customer_email:user.email,
+            success_url:"/",
+            cancel_url:"/",
+            metadata:{
+            first_name:deliveryinfo.first_name,
+            last_name:deliveryinfo.last_name,
+            email:deliveryinfo.email,
+            street:deliveryinfo.street,
+            city:deliveryinfo.city,
+            zipcode:deliveryinfo.zipcode,
+            state:deliveryinfo.state,
+            country:deliveryinfo.country,
+            phone:deliveryinfo.phone,
+            }
+        });
+
+        return res.status(200).json({
+            success:true,
+            url:session.url
+        });
     }
     catch(error){
         return res.status(500).json({
@@ -168,7 +294,8 @@ let stripepayment = (req,res)=>{
 //stripewebhook
 let stripewebhook = (req,res)=>{
     try{
-
+        let stripe =  req.headers["stripe-signature"];
+        let signingKey = process.env.
     }
     catch(error){
         return res.status(500).json({
@@ -204,4 +331,4 @@ let mpesawebhook = (req,res)=>{
     }
 }
 
-module.exports = {clerkwebhook,getproducts,getcart,removefromcart,addtocart,updatecart,stripepayment,stripewebhook,mpesapyament,mpesawebhook}
+module.exports = {clerkwebhook,getproducts,getcart,removefromcart,addtocart,updatecart,stripepayment,stripewebhook,mpesapyament,mpesawebhook,getorders}
