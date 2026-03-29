@@ -15,6 +15,8 @@ client.on("connect",()=>{
     console.log("Connected to Redis successfully!");
 });
 
+
+
 //clerkwebhook
 let clerkwebhook = async(req,res)=>{
     try{
@@ -79,7 +81,12 @@ let getproducts = async (req,res)=>{
             });
         }
         let products = await ProductModel.find();
-        await client.set("all_products",JSON.stringify(products),{"EX":60});
+        if(!products){
+            return res.status(404).json({
+                success:false
+            });
+        }
+        await client.set("all_products",JSON.stringify(products),"EX",60);
         return res.status(200).json({
             success:true,
             products:products
@@ -116,7 +123,7 @@ let getcart = async(req,res)=>{
                 success:false
             });
         }
-        await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),{"EX":60});
+        await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),"EX",60);
         return res.status(200).json({
             success:true,
             cart:userdata.cartdata
@@ -156,7 +163,7 @@ let addtocart = async(req,res)=>{
                 sizeindex:sizeindex
             }}},{new:true});
         }
-        await client.set(`cart:${userId}`, JSON.stringify(result.cartdata), { EX: 60 });
+        await client.set(`cart:${userId}`, JSON.stringify(result.cartdata),"EX",60);
         return res.status(200).json({ success: true });
     }
     catch(error){
@@ -183,7 +190,7 @@ let removefromcart = async(req,res)=>{
             });
         }
     let userdata =  await UserModel.findOneAndUpdate({clerkid:userId},{$pull : {cartdata:{id:itemId,sizeindex:sizeindex}}},{new:true})
-       await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),{"EX":60});
+       await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),"EX",60);
        return res.status(200).json({
         success:true
        });
@@ -212,7 +219,7 @@ let updatecart = async(req,res)=>{
             });
         }
       let userdata =   await UserModel.findOneAndUpdate({clerkid:userId,"cartdata.id":itemId,"cartdata.sizeindex":sizeindex},{$set:{"cartdata.$.quantity":quantity}},{new:true});
-      await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),{"EX":60});
+      await client.set(`cart:${userId}`,JSON.stringify(userdata.cartdata),"EX",60);
       return res.status(200).json({ success: true });
     }
     catch(error){
@@ -241,7 +248,7 @@ let stripepayment = async(req,res)=>{
         let {userId} = getAuth(req);
         if(!userId){
             return res.status(401).json({
-                success:true,
+                success:false,
             })
         }
         let user = await UserModel.findOne({clerkid:userId});
@@ -292,10 +299,11 @@ let stripepayment = async(req,res)=>{
 }
 
 //stripewebhook
-let stripewebhook = (req,res)=>{
+let stripewebhook = async(req,res)=>{
     try{
-        let stripe =  req.headers["stripe-signature"];
-        let signingKey = process.env.
+        let signature =  req.headers["stripe-signature"];
+        let event = await stripe.webhooks.constructEvent(req.body,signature,process.env.STRIPE_SIGNING_KEY);
+        console.log(event.type);
     }
     catch(error){
         return res.status(500).json({
