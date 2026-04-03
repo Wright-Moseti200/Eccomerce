@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema({
     category: { type: String, required: true },
     subCategory: { type: String, required: true },
     sizes: { type: [String], enum: ["S", "M", "L", "XL", "XXL"], required: true },
-    date: { type: Number, required: true }, 
+    date: { type: Number, required: true,default:Date.now()}, 
     bestseller: { type: Boolean, default: false }
 }, { timestamps: true });
 

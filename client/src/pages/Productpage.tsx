@@ -2,15 +2,16 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Link, useParams } from 'react-router-dom';
-import { assets ,products } from '../assets/assets';
+import { assets } from '../assets/assets';
 import { useEffect, useState, useContext } from 'react';
 import { Contextdata } from '../context/ContextProvider';
 
 const Productpage = () => {
   const {productid} = useParams();
+  const context = useContext(Contextdata);
+  const products = context?.products || [];
   const [product,setproduct] = useState<any[]>();
   const [index,setindex] = useState(0);
-  const context = useContext(Contextdata);
   const [size, setSize] = useState<string>('');
 
   useEffect(()=>{

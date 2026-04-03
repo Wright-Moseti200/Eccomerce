@@ -1,33 +1,89 @@
-import React, { createContext, useState } from 'react'
-import { products } from '../assets/assets';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '@clerk/clerk-react';
 
-type cartitem = {
+export type ProductType = {
+  _id: string,
+  name: string,
+  description: string,
+  price: number,
+  image: string[],
+  category: string,
+  subCategory: string,
+  sizes: string[],
+  date: number,
+  bestseller: boolean
+};
+
+export type cartitem = {
   id: string,
   quantity: number,
   sizeindex: number
 };
 
-type ContextType = {
+export type ContextType = {
+  products: ProductType[],
   cart: cartitem[],
-  addtocart: (id: string, sizes: number) => void,
-  removefromcart: (id: string) => void,
-  updatecart: (id: string, value: number, sizes: number) => void,
+  addtocart: (id: string, sizes: number) => Promise<void>,
+  removefromcart: (id: string, sizes: number) => Promise<void>,
+  updatecart: (id: string, value: number, sizes: number) => Promise<void>,
   gettotalamount: () => number,
   getcarttotal: () => number,
   navigate: ReturnType<typeof useNavigate>,
-  delivery_fee: number
+  delivery_fee: number,
+  backendUrl: string
 };
 
 export const Contextdata = createContext<ContextType | null>(null);
 
 const ContextProvider = ({ children }: { children: React.ReactNode }) => {
-
+  const [products, setProducts] = useState<ProductType[]>([]);
   const [cart, setCart] = useState<cartitem[]>([]);
   const navigate = useNavigate();
   const delivery_fee = 10;
+  const backendUrl = "http://localhost:3000";
+  const { getToken, isSignedIn } = useAuth();
 
-  const addtocart = (id: string, sizes: number): void => {
+  const getProductsData = async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/users/products');
+      if (response.data.success) {
+        setProducts(response.data.products);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUserCart = async () => {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const response = await axios.get(backendUrl + '/api/users/cart', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setCart(response.data.cart);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getProductsData();
+  }, []);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      getUserCart();
+    } else {
+      setCart([]);
+    }
+  }, [isSignedIn]);
+
+  const addtocart = async (id: string, sizes: number) => {
     let cartdata: cartitem;
     if (cart.length === 0) {
       cartdata = { id: id, quantity: 1, sizeindex: sizes };
@@ -47,14 +103,37 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
         setCart([...cart, cartdata]);
       }
     }
+
+    if (isSignedIn) {
+      try {
+        const token = await getToken();
+        await axios.post(backendUrl + '/api/users/addtocart', { itemId: id, sizeindex: sizes }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
-  const removefromcart = (id: string): void => {
-    const newcart = cart.filter((element) => element.id !== id);
+  const removefromcart = async (id: string, sizes: number) => {
+    // Note: Updated to expect sizes as well to match backend logic strictly.
+    const newcart = cart.filter((element) => !(element.id === id && element.sizeindex === sizes));
     setCart(newcart);
+
+    if (isSignedIn) {
+      try {
+        const token = await getToken();
+        await axios.post(backendUrl + '/api/users/removefromcart', { itemId: id, sizeindex: sizes }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
-  const updatecart = (id: string, value: number, sizes: number): void => {
+  const updatecart = async (id: string, value: number, sizes: number) => {
     if (value < 1) {
       alert("Value cannot be less than 1");
       return;
@@ -64,6 +143,17 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
         ? { ...element, quantity: value }
         : element
     ));
+
+    if (isSignedIn) {
+      try {
+        const token = await getToken();
+        await axios.post(backendUrl + '/api/users/updatecart', { itemId: id, quantity: value, sizeindex: sizes }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   const gettotalamount = (): number => {
@@ -82,7 +172,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <Contextdata.Provider value={{ addtocart, cart, removefromcart, updatecart, gettotalamount, getcarttotal, navigate, delivery_fee }}>
+    <Contextdata.Provider value={{ products, addtocart, cart, removefromcart, updatecart, gettotalamount, getcarttotal, navigate, delivery_fee, backendUrl }}>
       {children}
     </Contextdata.Provider>
   );

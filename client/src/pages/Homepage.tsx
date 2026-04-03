@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
-import { assets, products} from '../assets/assets'
+import { assets } from '../assets/assets'
+import { useContext } from 'react'
+import { Contextdata } from '../context/ContextProvider'
 import "../App.css"
 const Homepage = () => {
 
+    const context = useContext(Contextdata);
+    const products = context?.products || [];
     const latestcollection = products.filter((element)=>element.bestseller===false).slice(0,10).reverse();
     const bestseller = products.filter((element)=>element.bestseller===true).slice(0,5).reverse();
 

@@ -9,6 +9,7 @@ import Cart from './pages/Cart'
 import Productpage from './pages/Productpage'
 import Checkout from './pages/Checkout'
 import ContextProvider from './context/ContextProvider'
+import Order from './pages/order'
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="cart" element={<Cart/>}/>
             <Route path="product/:productid" element={<Productpage/>}/>
             <Route path="checkout" element={<Checkout/>}/>
+            <Route path="orders" element={<Order/>}/>
           </Route>
         </Routes>
       </ContextProvider>

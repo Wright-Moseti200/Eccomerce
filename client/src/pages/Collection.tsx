@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import { products } from '../assets/assets'
+import React, { useState, useEffect, useContext } from 'react'
 import Card from '../components/Card'
+import { Contextdata } from '../context/ContextProvider'
 
 const Collection = () => {
 
+  const context = useContext(Contextdata);
+  const products = context?.products || [];
   const [filterProducts, setFilterProducts] = useState(products);
   const [category, setCategory] = useState<string[]>([]);
   const [subCategory, setSubCategory] = useState<string[]>([]);
@@ -40,7 +42,7 @@ const Collection = () => {
 
   useEffect(() => {
     applyFilter();
-  }, [category, subCategory]);
+  }, [category, subCategory, products]);
 
 
   return (

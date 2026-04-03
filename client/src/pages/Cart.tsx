@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { assets, products } from '../assets/assets'
+import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { Contextdata } from '../context/ContextProvider'
 
 const Cart = () => {
 
   const context = useContext(Contextdata);
+  const products = context?.products || [];
   const [cartItems, setCartItems] = useState<any[]>([]);
   const navigate = useNavigate();
 
@@ -59,7 +60,7 @@ const Cart = () => {
                   <p className='font-medium text-sm sm:text-base hidden sm:block'>Ksh {item.price * item.quantity}</p>
                 </div>
                 
-                <img onClick={() => context?.removefromcart(item._id)} className='w-4 sm:w-5 cursor-pointer hover:opacity-75 transition-opacity justify-self-end' src={assets.bin_icon} alt="delete" />
+                <img onClick={() => context?.removefromcart(item._id, item.sizeindex)} className='w-4 sm:w-5 cursor-pointer hover:opacity-75 transition-opacity justify-self-end' src={assets.bin_icon} alt="delete" />
               </div>
             ))}
           </section>
