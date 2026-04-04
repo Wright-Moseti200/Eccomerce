@@ -11,6 +11,5 @@ userRoutes.post("/updatecart", requireAuth(), updatecart);
 userRoutes.get("/orders", requireAuth(), getorders);
 userRoutes.post("/stripepayment", requireAuth(), stripepayment);
 userRoutes.post("/mpesapayment", requireAuth(), mpesapyament);
-userRoutes.post("/mpesawebhook", mpesawebhook);
 
 module.exports={userRoutes};

@@ -32,7 +32,10 @@ export type ContextType = {
   getcarttotal: () => number,
   navigate: ReturnType<typeof useNavigate>,
   delivery_fee: number,
-  backendUrl: string
+  backendUrl: string,
+  stripePayment: (deliveryinfo: any, cartdata: any[]) => Promise<string | undefined>,
+  mpesaPayment: (deliveryinfo: any, cartdata: any[]) => Promise<string | undefined>,
+  getOrders: () => Promise<any[]>
 };
 
 export const Contextdata = createContext<ContextType | null>(null);
@@ -171,8 +174,66 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     return cart.length;
   };
 
+  const stripePayment = async (deliveryinfo: any, cartdata: any[]): Promise<string | undefined> => {
+    if (isSignedIn) {
+      try {
+        const token = await getToken();
+        const response = await axios.post(backendUrl + '/api/users/stripepayment', { deliveryinfo, cartdata }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+            return response.data.url;
+        }
+      } catch (error) {
+        console.log("Stripe Payment Error:", error);
+      }
+    } else {
+        alert("Please sign in to place an order.");
+    }
+    return undefined;
+  };
+
+  const mpesaPayment = async (deliveryinfo: any, cartdata: any[]): Promise<string | undefined> => {
+    if (isSignedIn) {
+      try {
+        const token = await getToken();
+        const response = await axios.post(backendUrl + '/api/users/mpesapayment', { deliveryinfo, cartdata }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+            return response.data.url;
+        }
+      } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.message) {
+            alert(error.response.data.message);
+        }
+        console.log("M-Pesa Payment Error:", error);
+      }
+    } else {
+        alert("Please sign in to place an order.");
+    }
+    return undefined;
+  };
+
+  const getOrders = async (): Promise<any[]> => {
+    if (isSignedIn) {
+      try {
+        const token = await getToken();
+        const response = await axios.get(backendUrl + '/api/users/orders', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          return response.data.orders;
+        }
+      } catch (error) {
+        console.log("Get Orders Error:", error);
+      }
+    }
+    return [];
+  };
+
   return (
-    <Contextdata.Provider value={{ products, addtocart, cart, removefromcart, updatecart, gettotalamount, getcarttotal, navigate, delivery_fee, backendUrl }}>
+    <Contextdata.Provider value={{ products, addtocart, cart, removefromcart, updatecart, gettotalamount, getcarttotal, navigate, delivery_fee, backendUrl, stripePayment, mpesaPayment, getOrders }}>
       {children}
     </Contextdata.Provider>
   );

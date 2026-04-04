@@ -342,8 +342,8 @@ let stripepayment = async(req,res)=>{
             price_data:{
                 currency:"KES",
                 product_data:{
-                    names:`${element.name} Size - ${element.size}`,
-                    image:[element.image[0]]
+                    name:`${element.name} Size - ${element.size}`,
+                    images:[element.image[0]]
                 },
                 unit_amount:Math.round(element.price*100)
             },
@@ -355,8 +355,8 @@ let stripepayment = async(req,res)=>{
             mode:"payment",
             line_items:line_items,
             customer_email:user.email,
-            success_url:"/",
-            cancel_url:"/",
+            success_url:"http://localhost:5173/orders",
+            cancel_url:"http://localhost:5173/checkout",
             metadata:{
             first_name:deliveryinfo.first_name,
             last_name:deliveryinfo.last_name,
@@ -432,7 +432,7 @@ let mpesapyament = async(req,res)=>{
             amount:totalamount,
             currency:"KES",
             channels:["mobile_money"],
-            callback_url:"http://localhost:5173",
+            callback_url:"http://localhost:5173/orders",
             metadata:{
                 first_name: deliveryinfo.first_name,
                 last_name: deliveryinfo.last_name,
@@ -465,12 +465,12 @@ let mpesawebhook = async(req,res)=>{
     try{
         const secret = process.env.PAYSTACK_SECRET_KEY;
         const hash = crypto.createHmac('sha512', secret)
-                           .update(JSON.stringify(req.body))
+                           .update(req.body) // req.body is securely passed as raw Buffer because of express.raw
                            .digest('hex');
         if (hash !== req.headers['x-paystack-signature']) {
             return res.status(401).send('Invalid signature');
         }
-        let event = req.body;
+        let event = JSON.parse(req.body.toString());
         if(event.event === "charge.success"){
             const { metadata } = event.data;
             let clerkId = metadata.clerkid;
