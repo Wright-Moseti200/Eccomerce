@@ -25,6 +25,8 @@ app.use(clerkMiddleware());
 app.use("/api/users",userRoutes);
 app.use("/api/admin",adminroutes);
 
+
+
 app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message, stack: err.stack, full: String(err) });
 });
