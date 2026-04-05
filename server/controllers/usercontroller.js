@@ -355,8 +355,8 @@ let stripepayment = async(req,res)=>{
             mode:"payment",
             line_items:line_items,
             customer_email:user.email,
-            success_url:"http://localhost:5173/orders",
-            cancel_url:"http://localhost:5173/checkout",
+            success_url:"https://eccomercewebsite123.netlify.app/orders",
+            cancel_url:"https://eccomercewebsite123.netlify.app/checkout",
             metadata:{
             first_name:deliveryinfo.first_name,
             last_name:deliveryinfo.last_name,
@@ -432,7 +432,7 @@ let mpesapyament = async(req,res)=>{
             amount:totalamount,
             currency:"KES",
             channels:["mobile_money"],
-            callback_url:"http://localhost:5173/orders",
+            callback_url:"https://eccomercewebsite123.netlify.app/orders",
             metadata:{
                 first_name: deliveryinfo.first_name,
                 last_name: deliveryinfo.last_name,
