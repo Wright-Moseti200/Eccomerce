@@ -3,7 +3,7 @@ import {assets} from '../assets/assets'
 import { Outlet,Link, NavLink } from 'react-router-dom'
 import Footer from './Footer'
 import { Contextdata } from '../context/ContextProvider'
-import {useUser,useClerk,SignedIn,SignedOut,UserButton} from "@clerk/clerk-react";
+import {useClerk,SignedIn,SignedOut,UserButton} from "@clerk/clerk-react";
 
 const Navbar = () => {
   const context = useContext(Contextdata);
