@@ -8,7 +8,7 @@ let crypto = require("crypto");
 const { ProductModel } = require("../models/productmodel");
 let Paystack = require("@paystack/paystack-sdk");
 const { OrderModel } = require("../models/ordermodel");
-let client = new Redis();
+let client = new Redis(process.env.REDIS_URL);
 let paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY);
 
 client.on("error",(err)=>{
