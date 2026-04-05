@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import {assets} from '../assets/assets'
 import { Outlet,Link, NavLink } from 'react-router-dom'
 import Footer from './Footer'
@@ -7,7 +7,6 @@ import {useUser,useClerk,SignedIn,SignedOut,UserButton} from "@clerk/clerk-react
 
 const Navbar = () => {
   const context = useContext(Contextdata);
-  const {user} = useUser();
   const {openSignIn} = useClerk();
   const [visible, setVisible] = useState(false);
 

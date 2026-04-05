@@ -11,7 +11,6 @@ const Productpage = () => {
   const context = useContext(Contextdata);
   const products = context?.products || [];
   const [product,setproduct] = useState<any[]>();
-  const [index,setindex] = useState(0);
   const [size, setSize] = useState<string>('');
 
   useEffect(()=>{
