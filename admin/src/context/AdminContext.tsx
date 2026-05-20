@@ -16,7 +16,7 @@ export const AdminContext = createContext<AdminContextType | null>(null);
 const AdminContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
-  const backendUrl = "https://eccomerce-production-baff.up.railway.app";
+  const backendUrl = "https://eccomerce-alpha-nine.vercel.app";
 
   const getProductsData = async () => {
     try {

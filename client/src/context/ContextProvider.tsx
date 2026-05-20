@@ -45,7 +45,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<cartitem[]>([]);
   const navigate = useNavigate();
   const delivery_fee = 10;
-  const backendUrl = "https://eccomerce-production-baff.up.railway.app";
+  const backendUrl = "https://eccomerce-alpha-nine.vercel.app";
   const { getToken, isSignedIn } = useAuth();
 
   const getProductsData = async () => {
